@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">微密</string>
+    <string name="accessibility_service_label">微密</string>
+    <string name="accessibility_service_description">用途:懂的都懂☺\n用法:\n\t在微信输入框输入wm:前缀，再输入要加密的内容，然后长按文字;\n\t在微信聊天列表长按要解码的消息(以mw:为前缀)</string>
+</resources>
