@@ -5,7 +5,7 @@
     android:accessibilityEventTypes="typeViewLongClicked"
     android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagRetrieveInteractiveWindows|flagReportViewIds|flagRequestEnhancedWebAccessibility"
     android:accessibilityFeedbackType="feedbackGeneric"
-    android:notificationTimeout="100"
+    android:notificationTimeout="10"
     android:canRetrieveWindowContent="true"
     android:settingsActivity="com.jiashie.MainActivity"
     />

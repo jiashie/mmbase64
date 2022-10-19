@@ -105,11 +105,11 @@ class Preference<T>(private val name: String, private val default: T) {
         val objectOutputStream = ObjectOutputStream(
             byteArrayOutputStream)
         objectOutputStream.writeObject(obj)
-        var serStr = byteArrayOutputStream.toString("ISO-8859-1")
-        serStr = java.net.URLEncoder.encode(serStr, "UTF-8")
+        var str = byteArrayOutputStream.toString("ISO-8859-1")
+        str = java.net.URLEncoder.encode(str, "UTF-8")
         objectOutputStream.close()
         byteArrayOutputStream.close()
-        return serStr
+        return str
     }
 
     /**
@@ -126,9 +126,9 @@ class Preference<T>(private val name: String, private val default: T) {
     @Suppress("UNCHECKED_CAST")
     @Throws(IOException::class, ClassNotFoundException::class)
     private fun <A> deSerialization(str: String): A {
-        val redStr = java.net.URLDecoder.decode(str, "UTF-8")
+        val decoded = java.net.URLDecoder.decode(str, "UTF-8")
         val byteArrayInputStream = ByteArrayInputStream(
-            redStr.toByteArray(charset("ISO-8859-1")))
+            decoded.toByteArray(charset("ISO-8859-1")))
         val objectInputStream = ObjectInputStream(
             byteArrayInputStream)
         val obj = objectInputStream.readObject() as A

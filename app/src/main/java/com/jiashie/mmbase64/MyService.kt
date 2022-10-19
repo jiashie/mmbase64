@@ -1,15 +1,12 @@
 package com.jiashie.mmbase64
 
 import android.accessibilityservice.AccessibilityService
-import android.app.ProgressDialog.show
-import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import android.widget.TextView
 import android.widget.Toast
 
 
@@ -29,21 +26,25 @@ class MyService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event?.let {
             val source = it.source ?: return
+            try {
 
-            if (TextUtils.isEmpty(source.text)) {
-                return
-            }
-            if (!App.spOpenFlag) {
-                return
-            }
-            if (TextUtils.isEmpty(App.spPwd)) {
-                return
-            }
+                if (TextUtils.isEmpty(source.text)) {
+                    return
+                }
+                if (!App.spOpenFlag) {
+                    return
+                }
+                if (TextUtils.isEmpty(App.spPwd)) {
+                    return
+                }
 
-            if ("android.widget.EditText" == source.className) {
-                handleEditTextInputEvent(it)
-            } else if ("android.widget.TextView" == source.className) {
-                handleMsgTextViewEvent(it)
+                if ("android.widget.EditText" == source.className) {
+                    handleEditTextInputEvent(source)
+                } else if ("android.widget.TextView" == source.className) {
+                    handleMsgTextViewEvent(source)
+                }
+            } finally {
+                source.recycle()
             }
         }
     }
@@ -54,10 +55,10 @@ class MyService : AccessibilityService() {
     /**
      * 处理在输入框长按选中的事件
      *
-     * @param event
+     * @param source
      */
-    private fun handleEditTextInputEvent(event: AccessibilityEvent) {
-        val text = event.source.text
+    private fun handleEditTextInputEvent(source: AccessibilityNodeInfo) {
+        val text = source.text
         if (text.length <= ENCODE_START.length) {
             return
         }
@@ -70,7 +71,7 @@ class MyService : AccessibilityService() {
             val arguments = Bundle()
             arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
                 DECODE_START + encode)
-            event.source.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
+            source.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
         } else if (text.startsWith(DECODE_START)) {
             //解码
             val encoded = text.substring(DECODE_START.length)
@@ -81,7 +82,7 @@ class MyService : AccessibilityService() {
             val arguments = Bundle()
             arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
                 ENCODE_START + decode)
-            event.source.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
+            source.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
         }
 
     }
@@ -89,10 +90,10 @@ class MyService : AccessibilityService() {
     /**
      * 处理在消息列表长按选中的事件
      *
-     * @param event
+     * @param source
      */
-    private fun handleMsgTextViewEvent(event: AccessibilityEvent) {
-        val text = event.source.text
+    private fun handleMsgTextViewEvent(source: AccessibilityNodeInfo) {
+        val text = source.text
         if (text.length <= DECODE_START.length || !text.startsWith(DECODE_START)) {
             return
         }
@@ -104,10 +105,10 @@ class MyService : AccessibilityService() {
         val arguments = Bundle()
         arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
             decode)
-        event.source.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
+        source.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
 
         val bounds = Rect()
-        event.source.getBoundsInScreen(bounds)
+        source.getBoundsInScreen(bounds)
 
         toast(decode, bounds.centerY())
 
